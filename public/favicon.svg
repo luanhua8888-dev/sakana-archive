@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#254451"/>
+  <!-- Vệt sóng mờ -->
+  <path d="M 6 42 C 18 36, 32 46, 48 40 C 56 36, 60 40, 62 38" stroke="#a7c6bd" stroke-width="1" stroke-dasharray="2 2" opacity="0.4"/>
+  <!-- Đuôi cá -->
+  <path d="M 16 32 C 12 26, 8 20, 4 18 C 6 24, 8 29, 9 32 C 8 35, 6 40, 4 46 C 8 44, 12 38, 16 32 Z" fill="#f0ecdf"/>
+  <!-- Thân cá -->
+  <path d="M 15 32 C 20 25, 30 20, 44 20 C 54 20, 58 25, 60 31 C 61 32, 61 33, 60 34 C 56 39, 44 44, 34 44 C 23 44, 17 38, 15 32 Z" fill="#f0ecdf"/>
+  <!-- Vây lưng -->
+  <path d="M 33 20 C 35 15, 41 12, 47 14 C 45 18, 41 20, 37 20 Z" fill="#f0ecdf"/>
+  <!-- Chi tiết mang & mắt -->
+  <path d="M 52 27 C 50 31, 50 35, 53 37" stroke="#254451" stroke-width="1.2" stroke-linecap="round"/>
+  <circle cx="56" cy="30" r="1.8" fill="#254451"/>
+  <!-- Vây ngực -->
+  <path d="M 45 34 C 41 38, 36 41, 32 42 C 35 38, 40 35, 44 33 Z" fill="#a7c6bd"/>
+</svg>
