@@ -1,11 +1,20 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
-import hostingConfig from "./.openai/hosting.json";
+import fs from "node:fs";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
+
+let hostingConfig: { d1?: string | null; r2?: string | null } = { d1: null, r2: null };
+try {
+  if (fs.existsSync("./.openai/hosting.json")) {
+    hostingConfig = JSON.parse(fs.readFileSync("./.openai/hosting.json", "utf-8"));
+  }
+} catch {
+  // fallback
+}
 
 const { d1, r2 } = hostingConfig;
 
