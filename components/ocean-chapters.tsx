@@ -24,14 +24,14 @@ export function OceanChapters({ onAddSpecimen }: { onAddSpecimen: () => void }) 
         <div className="depth-layout">
           <div className="depth-copy">
             <header className="reveal"><h2 id="depths-title">Càng xuống sâu,<br /><em>càng nhiều chuyện.</em></h2><p>Một mặt biển. Những thế giới khác nhau.<br />Hãy cùng nhìn xuống dưới làn sóng.</p></header>
-            <div className="depth-index">{depths.map(depth => <article className="reveal" key={depth.label}><span className="folio-label">{depth.label}</span><h3>{depth.title}</h3><p>{depth.text}</p></article>)}</div>
+            <div className="depth-index"><span className="depth-progress" aria-hidden="true" />{depths.map(depth => <article className="reveal" key={depth.label}><span className="folio-label">{depth.label}</span><h3>{depth.title}</h3><p>{depth.text}</p></article>)}</div>
             <span className="depth-end"><ArrowDown size={16} /> THEO CHIỀU SÂU CỦA BIỂN</span>
           </div>
           <figure className="depth-plate reveal"><img src="/chapters/depths.webp" alt="Tranh khắc biển từ mặt nước có cá chuồn xuống đàn cá bạc và cá đuối gần đáy" width={1024} height={1536} loading="lazy" /><figcaption>H.03 — Từ mặt sóng đến nền cát · Tranh minh họa</figcaption></figure>
         </div>
       </section>
 
-      <section className="folio folio-current" id="dong-chay" aria-labelledby="current-title">
+      <section className="folio folio-current" id="dong-chay" aria-labelledby="current-title"><span className="ink-drop" aria-hidden="true" />
         <div className="folio-topline"><span>04 / DÒNG CHẢY</span><span>CHUYỂN ĐỘNG KHÔNG NGỪNG</span></div>
         <div className="current-intro reveal"><h2 id="current-title">Không có con đường.<br /><em>Vẫn có lối đi.</em></h2><p>Một lần nghiêng mình, cả đàn đổi hướng.<br />Giữa biển rộng, chuyển động của từng con cá hòa vào một nhịp chung.</p></div>
         <figure className="current-plate reveal"><img src="/chapters/currents.webp" alt="Đàn cá bạc uốn thành dòng chảy trên nền biển xanh mực" width={1536} height={1024} loading="lazy" /><figcaption><span>NHỊP ĐIỆU CỦA BẦY ĐÀN</span><span>H.04 / SAKANA</span></figcaption></figure>

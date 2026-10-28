@@ -49,6 +49,7 @@ export function SakanaButton({
         rel={rel}
         aria-label={ariaLabel}
         className={`${baseClasses} ${className}`}
+        data-magnetic
       >
         {content}
       </a>
@@ -62,6 +63,7 @@ export function SakanaButton({
       onClick={onClick}
       aria-label={ariaLabel}
       className={`${baseClasses} ${className}`}
+      data-magnetic
     >
       {content}
     </button>

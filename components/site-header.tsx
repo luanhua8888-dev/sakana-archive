@@ -169,7 +169,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-[#f0ecdf]/98 backdrop-blur-md border-b border-[#c8d1c5] shadow-[0_4px_20px_-10px_rgba(25,59,71,0.1)] transition-all duration-300">
+      <header className="sticky top-0 z-50 w-full bg-[#f0ecdf] border-b border-[#c8d1c5] shadow-[0_4px_20px_-10px_rgba(25,59,71,0.1)] transition-all duration-300">
         <div className="max-w-[1720px] mx-auto h-[82px] sm:h-[86px] flex items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo SAKANA */}
           <a
@@ -291,6 +291,7 @@ export function SiteHeader() {
       {catalogOpen && (
         <div
           className="fixed inset-0 z-50 bg-[#0c1f25]/60 backdrop-blur-md flex flex-col justify-start overflow-y-auto animate-in fade-in duration-200"
+          data-lenis-prevent
           onClick={() => setCatalogOpen(false)}
         >
           <div

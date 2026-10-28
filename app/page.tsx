@@ -8,6 +8,7 @@ import { AddSpecimenDialog } from "@/components/add-specimen-dialog";
 import { WaveButtonFrame } from "@/components/wave-button-frame";
 import { SakanaButton } from "@/components/sakana-button";
 import { OceanChapters } from "@/components/ocean-chapters";
+import { ScrollMotion, OceanMarquee, useDialogEntrance } from "@/components/scroll-motion";
 import { loadSpecimens, type SavedSpecimen } from "@/lib/collection-storage";
 
 interface FishSpecies {
@@ -152,6 +153,7 @@ export default function Home() {
   const imageUrls = useRef<string[]>([]);
   const scene = useRef<HTMLDivElement>(null);
   const speciesList = [...species, ...customSpecies];
+  useDialogEntrance(selected, motion);
   useEffect(() => {
     let active = true;
     void loadSpecimens().then(items => {
@@ -177,15 +179,9 @@ export default function Home() {
     imageUrls.current.push(image);
     setCustomSpecies(current => [...current, { ...item, image }]);
   }
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); }
-    }), { threshold: 0.12 });
-    document.querySelectorAll(".reveal").forEach(item => observer.observe(item));
-    return () => observer.disconnect();
-  }, [customSpecies.length]);
   return <main className={motion ? "" : "motion-paused"}>
     <svg width="0" height="0" aria-hidden="true" className="image-filters"><defs><filter id="ink-light" colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 .85 0 0 0 0 .87 0 0 0 0 .79 1 1 1 0 -.89"/></filter><filter id="ink-dark" colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 .15 0 0 0 0 .26 0 0 0 0 .29 1 1 1 0 -.89"/></filter><filter id="ink-cutout" colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values=".265 .52 .10 0 .062 .22 .43 .08 0 .186 .187 .367 .068 0 .226 0 0 0 1 0"/></filter></defs></svg>
+    <ScrollMotion motion={motion} itemCount={speciesList.length} locked={selected !== null || addOpen} />
     <SiteHeader />
     <section className="hero" id="kham-pha" onPointerMove={event => {
       if (!motion || event.pointerType === "touch" || !scene.current) return;
@@ -194,6 +190,7 @@ export default function Home() {
       scene.current.style.setProperty("--my", `${(event.clientY-r.top)/r.height-.5}`);
     }} onPointerLeave={() => { scene.current?.style.setProperty("--mx", "0"); scene.current?.style.setProperty("--my", "0"); }}>
       <div className="hero-grain"/>
+      <div className="bubble-field" aria-hidden="true"/>
       <div className="hero-top"><span className="font-mono tracking-[0.22em] font-medium text-[#cbe0d5]">MỘT BỘ SƯU TẬP TỪ LÒNG BIỂN</span><span className="font-mono tracking-[0.2em] text-[#cbe0d5]/80">EST. 2026 &nbsp; / &nbsp; VOL. 01</span></div>
       <div className="hero-copy">
         {/* Eyebrow trang nhã phong cách thư tịch biển */}
@@ -207,13 +204,13 @@ export default function Home() {
           {/* Nền chìm chữ Hán mờ ảo tạo chiều sâu mỹ thuật đại dương */}
           <div
             aria-hidden="true"
-            className="absolute -left-4 -top-10 sm:-top-16 text-[150px] sm:text-[230px] lg:text-[270px] font-japanese text-[#ffffff]/[0.035] leading-none pointer-events-none select-none -z-10 font-normal tracking-widest"
+            className="hero-watermark absolute -left-4 -top-10 sm:-top-16 text-[150px] sm:text-[230px] lg:text-[270px] font-japanese text-[#ffffff]/[0.035] leading-none pointer-events-none select-none -z-10 font-normal tracking-widest"
           >
             海洋
           </div>
 
           {/* Dòng định danh Poster Khảo cứu */}
-          <div className="flex items-center gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.28em] text-[#86aba0] uppercase mb-4 sm:mb-5">
+          <div className="hero-label flex items-center gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.28em] text-[#86aba0] uppercase mb-4 sm:mb-5">
             <span className="w-8 h-[1px] bg-[#86aba0]/60" />
             <span>CHƯƠNG I // KHẢO CỨU ĐẠI DƯƠNG</span>
             <span className="text-[#aab3a6]/30 hidden sm:inline">|</span>
@@ -235,14 +232,14 @@ export default function Home() {
         </div>
 
         {/* Khối mô tả thanh lịch */}
-        <p className="font-mono font-light text-[14.5px] sm:text-[16px] text-[#cde0d7]/90 leading-[1.85] tracking-[0.01em] max-w-[480px] mb-8">
+        <p className="hero-lede font-mono font-light text-[14.5px] sm:text-[16px] text-[#cde0d7]/90 leading-[1.85] tracking-[0.01em] max-w-[480px] mb-8">
           Lặn vào thế giới của những chiếc vây.<br/>
           Mỗi loài cá, một câu chuyện chưa kể.
         </p>
         <SakanaButton
           href="#bo-suu-tap"
           idPrefix="hero-explore"
-          className="px-8 sm:px-10 py-3.5 sm:py-4 text-[13px] sm:text-[14px]"
+          className="hero-cta px-8 sm:px-10 py-3.5 sm:py-4 text-[13px] sm:text-[14px]"
         >
           <span>BẮT ĐẦU KHÁM PHÁ</span>
           <ArrowRight size={16} />
@@ -265,7 +262,8 @@ export default function Home() {
       <div className="specimen-grid">{speciesList.map((fish, index) => <button className="specimen-card reveal" style={{ "--delay": `${index * 100}ms` } as CSSProperties} key={fish.id ?? fish.name} onClick={() => setSelected(index)} aria-label={`Khám phá ${fish.name}`}><div className="card-top font-mono"><span>PLATE {String(index + 1).padStart(2, "0")}</span><span>{fish.tag}</span></div><div className="card-art"><Specimen crop={fish.crop} image={fish.image}/><span className="card-orbit"/></div><div className="card-bottom"><div><h3 className="font-mono">{fish.name}</h3><p className="font-mono italic text-[13.5px]">{fish.latin}</p></div><span className="circle-arrow"><ArrowUpRight size={21}/></span></div></button>)}</div>
       <div className="collection-foot font-mono"><span>{speciesList.length} HÌNH DÁNG. {speciesList.length} CÁCH SỐNG.</span><Waves size={25} strokeWidth={1}/><span>MỘT ĐẠI DƯƠNG CHUNG.</span></div>
     </section>
-    <section className="story" id="cau-chuyen"><div className="story-image reveal"><img src="/ocean-collage.png" alt="Collage cá bạc, tranh sóng biển Nhật Bản và những trang giấy cổ" loading="lazy"/><span className="image-label font-mono">FRAGMENTS OF THE SEA — 001</span><div className="story-stamp font-mono">海<span className="font-mono">BIỂN CẢ</span></div></div><div className="story-copy reveal"><div className="eyebrow font-mono">02 / CHUYỆN TỪ LÒNG BIỂN</div><h2>Không chỉ là cá.<br/>Là cả một<br/><em>thế giới.</em></h2><p className="font-mono font-light text-[15px] leading-[1.85]">Có những vẻ đẹp chỉ hiện ra khi ta chậm lại. Một đường vân trên vảy, nhịp đập của vây, hay cách cả đàn cá cùng đổi hướng.</p><p className="font-mono font-light text-[15px] leading-[1.85]">Sakana là một cuốn thủy tộc chí nhỏ — nơi chúng ta quan sát, tìm hiểu và yêu thêm thế giới ở phía bên kia mặt nước.</p><div className="pt-2"><SakanaButton href="#bo-suu-tap" idPrefix="story-collection"><span>Mở cuốn thủy tộc chí</span> <ArrowRight size={16}/></SakanaButton></div></div></section>
+    <section className="story" id="cau-chuyen"><div className="story-swimmer-layer" aria-hidden="true"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"><path className="swim-trail" d="M1060,40 C850,20 760,230 560,250 S240,330 170,470 S20,600 -60,560"/></svg><div className="story-swimmer"><img src="/species/flying-fish.png" alt="" draggable="false"/></div></div><div className="story-image reveal"><img src="/ocean-collage.png" alt="Collage cá bạc, tranh sóng biển Nhật Bản và những trang giấy cổ" loading="lazy"/><span className="image-label font-mono">FRAGMENTS OF THE SEA — 001</span><div className="story-stamp font-mono">海<span className="font-mono">BIỂN CẢ</span></div></div><div className="story-copy reveal"><div className="eyebrow font-mono">02 / CHUYỆN TỪ LÒNG BIỂN</div><h2>Không chỉ là cá.<br/>Là cả một<br/><em>thế giới.</em></h2><p className="font-mono font-light text-[15px] leading-[1.85]">Có những vẻ đẹp chỉ hiện ra khi ta chậm lại. Một đường vân trên vảy, nhịp đập của vây, hay cách cả đàn cá cùng đổi hướng.</p><p className="font-mono font-light text-[15px] leading-[1.85]">Sakana là một cuốn thủy tộc chí nhỏ — nơi chúng ta quan sát, tìm hiểu và yêu thêm thế giới ở phía bên kia mặt nước.</p><div className="pt-2"><SakanaButton href="#bo-suu-tap" idPrefix="story-collection"><span>Mở cuốn thủy tộc chí</span> <ArrowRight size={16}/></SakanaButton></div></div></section>
+    <OceanMarquee />
     <OceanChapters onAddSpecimen={() => setAddOpen(true)} />
     <footer><a className="brand" href="#kham-pha" aria-label="Sakana — Về đầu trang"><SakanaLogo size={48} theme="ink" /><div className="flex flex-col"><div className="flex items-center gap-2"><span className="font-japanese text-[22px] text-[#193b47] leading-none">さかな</span><span className="px-1.5 py-0.5 bg-[#ba3b32] text-[#fbf8f1] text-[9px] font-serif rounded-[2px] leading-tight">魚</span></div><span className="font-mono tracking-[0.24em] text-[11px] font-semibold text-[#193b47] uppercase mt-0.5">SAKANA</span></div></a><p className="font-mono italic text-[14.5px]">Một chút tò mò. Cả một đại dương.</p><div className="flex justify-end"><SakanaButton href="#kham-pha" idPrefix="footer-kham-pha" className="px-5 py-2 text-[11.5px]"><span>Trở về mặt nước</span> <ArrowUpRight size={15}/></SakanaButton></div><span className="footer-bottom font-mono">© 2026 SAKANA &nbsp; · &nbsp; AN OCEAN OF CURIOSITY</span></footer>
     <Dialog open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}><DialogContent className="fish-dialog paper font-mono" showCloseButton={false}>{selected !== null && speciesList[selected] && <><DialogClose className="dialog-close" aria-label="Đóng thông tin"><X size={22}/></DialogClose><span className="eyebrow font-mono">THỦY TỘC CHÍ / PLATE {String(selected + 1).padStart(2, "0")}</span><div className="dialog-art"><Specimen crop={speciesList[selected].crop} image={speciesList[selected].image}/></div><DialogTitle className="dialog-title font-mono">{speciesList[selected].name}</DialogTitle><span className="latin font-mono">{speciesList[selected].latin}</span><DialogDescription className="dialog-description font-mono">{speciesList[selected].description}</DialogDescription><dl className="fish-facts font-mono"><div><dt className="font-mono">MÔI TRƯỜNG</dt><dd className="font-mono">{speciesList[selected].habitat}</dd></div><div><dt className="font-mono">ĐẶC ĐIỂM</dt><dd className="font-mono">{speciesList[selected].trait}</dd></div></dl><p className="fish-note font-mono">{speciesList[selected].note}</p><p className="illustration-note font-mono">{speciesList[selected].id ? "Ảnh và thông tin do bạn thêm, lưu trên trình duyệt này." : "Tranh khắc minh họa theo nhóm cá, không dùng để định danh loài."}</p></>}</DialogContent></Dialog>
