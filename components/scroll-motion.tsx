@@ -64,7 +64,7 @@ export function ScrollMotion({ motion, itemCount, locked }: { motion: boolean; i
       .from(title.chars, { yPercent: 90, rotateX: -90, transformPerspective: 600, transformOrigin: "50% 100%", autoAlpha: 0, stagger: 0.022, duration: 1.3 }, 0.35)
       .from(".hero-lede, .hero-cta", { y: 26, autoAlpha: 0, stagger: 0.14, clearProps: settled }, "-=0.9")
       .from(".ocean-scene .orbit", { autoAlpha: 0, scale: 0.6, duration: 2.4, stagger: 0.25 }, 0.1)
-      .from(".fish-layer", { autoAlpha: 0, stagger: 0.2, duration: 2 }, 0.45)
+      .from(".hero-fish, .fish-layer", { autoAlpha: 0, stagger: 0.2, duration: 2 }, 0.45)
       .from(".floating-note", { autoAlpha: 0 }, 1)
       .from(".ocean-kanji, .compass, .scene-coordinate", { y: 30, autoAlpha: 0, stagger: 0.12 }, 1.1)
       .from(".hero-bottom > *", { y: 18, autoAlpha: 0, stagger: 0.1 }, 1.3);
@@ -91,15 +91,33 @@ export function ScrollMotion({ motion, itemCount, locked }: { motion: boolean; i
     lenis.current = instance;
     if (loading.current || lockedRef.current) instance.stop();
     instance.on("scroll", ScrollTrigger.update);
+    // Lenis owns the scroll position while it runs, so page jumps are routed through it.
+    const jump = (event: Event) => instance.scrollTo((event as CustomEvent<number>).detail, { immediate: true, force: true });
+    addEventListener("sakana:scroll-to", jump);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     return () => {
+      removeEventListener("sakana:scroll-to", jump);
       gsap.ticker.remove(tick);
       gsap.ticker.lagSmoothing(500, 33);
       instance.destroy();
       lenis.current = null;
     };
+  }, [motion]);
+
+  // The page grows when more specimens are shown; every trigger below has to re-measure.
+  useEffect(() => {
+    if (!motion) return;
+    let height = document.body.scrollHeight, timer = 0;
+    const observer = new ResizeObserver(() => {
+      if (Math.abs(document.body.scrollHeight - height) < 2) return;
+      height = document.body.scrollHeight;
+      clearTimeout(timer);
+      timer = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+    });
+    observer.observe(document.body);
+    return () => { observer.disconnect(); clearTimeout(timer); };
   }, [motion]);
 
   useEffect(() => {
@@ -191,11 +209,7 @@ export function ScrollMotion({ motion, itemCount, locked }: { motion: boolean; i
       items.forEach(item => item.classList.add("visible"));
       gsap.from(items, { autoAlpha: 0, duration: 1.2, ease: "expo.out", stagger: 0.1, clearProps: settled, ...vars });
     });
-    ScrollTrigger.batch(".specimen-card.reveal:not(.visible)", {
-      start: "top 90%", once: true,
-      onEnter: items => reveal(items, { y: 90, rotateX: -32, transformPerspective: 900, transformOrigin: "50% 0%" }),
-    });
-    ScrollTrigger.batch(".reveal:not(.specimen-card):not(.visible)", {
+    ScrollTrigger.batch(".reveal:not(.visible)", {
       start: "top 88%", once: true,
       onEnter: items => reveal(items, { y: 60 }),
     });

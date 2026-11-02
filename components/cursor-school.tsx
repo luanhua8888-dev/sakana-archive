@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { drawSwimmingFish, shrink } from "@/lib/fish-swim";
 
 interface Fish { x: number; y: number; vx: number; vy: number; width: number; slotX: number; slotY: number; phase: number; wag: number; speed: number; facing: number; turn: number; tilt: number; sprite: number; nextBubble: number }
 interface Bubble { x: number; y: number; r: number; vy: number; age: number; life: number; seed: number }
@@ -15,27 +16,8 @@ const species = [
   { src: "/species/pufferfish.png", width: 46 },
   { src: "/species/herring.png", width: 50 },
 ];
-const strips = 8;
+const strips = 12;
 const random = (min: number, max: number) => min + Math.random() * (max - min);
-
-// Halve repeatedly before the final draw so fine engraving lines don't alias.
-function shrink(image: HTMLImageElement, width: number) {
-  let source: CanvasImageSource = image, w = image.naturalWidth, h = image.naturalHeight;
-  while (w / 2 > width) {
-    const step = document.createElement("canvas");
-    step.width = Math.round(w / 2);
-    step.height = Math.round(h / 2);
-    step.getContext("2d")!.drawImage(source, 0, 0, step.width, step.height);
-    source = step; w = step.width; h = step.height;
-  }
-  const sprite = document.createElement("canvas");
-  sprite.width = Math.round(width);
-  sprite.height = Math.round(width * image.naturalHeight / image.naturalWidth);
-  const ctx = sprite.getContext("2d")!;
-  ctx.imageSmoothingQuality = "high"; // once, at load; per-frame draws are ~1:1
-  ctx.drawImage(source, 0, 0, sprite.width, sprite.height);
-  return sprite;
-}
 
 // A small school of engraved fish that trails the pointer and lets out the odd bubble.
 export function CursorSchool({ motion }: { motion: boolean }) {
@@ -78,7 +60,8 @@ export function CursorSchool({ motion }: { motion: boolean }) {
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.seen = true;
-      pointer.inside = true;
+      // Sections with their own creatures ask this school to slip away.
+      pointer.inside = !(event.target as Element | null)?.closest?.("[data-quiet-cursor]");
     };
     const leave = () => { pointer.inside = false; };
 
@@ -89,23 +72,16 @@ export function CursorSchool({ motion }: { motion: boolean }) {
       });
     };
 
-    // The plate is sliced into vertical strips that follow a travelling wave,
-    // stronger towards the tail, so the body flexes as the fish swims.
+    // The tail sweeps harder the faster the fish is swimming.
     const drawFish = (fish: Fish, sprite: HTMLCanvasElement) => {
       const w = fish.width, h = w * sprite.height / sprite.width;
       const pace = Math.min(1, Math.hypot(fish.vx, fish.vy) / fish.speed);
-      const amplitude = h * (0.05 + pace * 0.11);
-      const strip = sprite.width / strips, stripW = w / strips;
       ctx.save();
       ctx.translate(fish.x, fish.y + Math.sin(time * 1.4 + fish.phase) * 1.6 * (1 - pace));
       ctx.scale(fish.turn, 1);
       ctx.rotate(fish.tilt);
       ctx.scale(-1, 1);
-      for (let i = 0; i < strips; i++) {
-        const u = (i + 0.5) / strips;
-        const bend = Math.sin(fish.wag - u * 4.2) * amplitude * Math.pow(u, 1.6);
-        ctx.drawImage(sprite, i * strip, 0, strip + 1, sprite.height, -w / 2 + i * stripW, -h / 2 + bend, stripW + 0.6, h);
-      }
+      drawSwimmingFish(ctx, sprite, w, h, fish.wag, 0.5 + pace * 0.6, strips);
       ctx.restore();
     };
 

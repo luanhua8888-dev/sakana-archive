@@ -2,6 +2,11 @@
 
 import { ArrowDown, ArrowUpRight, Plus } from "lucide-react";
 import { SakanaButton } from "@/components/sakana-button";
+import { SchoolInterlude } from "@/components/school-interlude";
+import { AbyssInterlude } from "@/components/abyss-interlude";
+import { DescentSection } from "@/components/descent-section";
+import { SizeRuler } from "@/components/size-ruler";
+import { Aquarium } from "@/components/aquarium";
 
 const shapes = [
   { number: "01", name: "Lướt như một cánh chim", fish: "Cá đuối", className: "chapter-shape-art--ray" },
@@ -16,7 +21,7 @@ const depths = [
   { title: "Một thế giới sát đáy", label: "03 / ĐÁY BIỂN", text: "Cá đuối lướt qua nền cát. Giữa rạn đá và những tán rong, sự sống hiện ra theo một nhịp chậm hơn." },
 ];
 
-export function OceanChapters({ onAddSpecimen }: { onAddSpecimen: () => void }) {
+export function OceanChapters({ motion, onAddSpecimen }: { motion: boolean; onAddSpecimen: () => void }) {
   return (
     <>
       <section className="folio folio-depths" id="tang-nuoc" aria-labelledby="depths-title">
@@ -31,6 +36,8 @@ export function OceanChapters({ onAddSpecimen }: { onAddSpecimen: () => void }) 
         </div>
       </section>
 
+      <DescentSection motion={motion} />
+
       <section className="folio folio-current" id="dong-chay" aria-labelledby="current-title"><span className="ink-drop" aria-hidden="true" />
         <div className="folio-topline"><span>04 / DÒNG CHẢY</span><span>CHUYỂN ĐỘNG KHÔNG NGỪNG</span></div>
         <div className="current-intro reveal"><h2 id="current-title">Không có con đường.<br /><em>Vẫn có lối đi.</em></h2><p>Một lần nghiêng mình, cả đàn đổi hướng.<br />Giữa biển rộng, chuyển động của từng con cá hòa vào một nhịp chung.</p></div>
@@ -38,12 +45,16 @@ export function OceanChapters({ onAddSpecimen }: { onAddSpecimen: () => void }) 
         <div className="current-foot reveal"><span>水流 / DÒNG NƯỚC</span><p>Đi cùng nhau, thành một dải bạc giữa đại dương.</p><ArrowDown size={22} /></div>
       </section>
 
+      <SchoolInterlude motion={motion} />
+
       <section className="chapter chapter-shapes paper" id="hinh-dang" aria-labelledby="shapes-title">
         <div className="chapter-heading reveal"><span className="chapter-kicker">05 / HÌNH DÁNG</span><h2 id="shapes-title">Mỗi đường nét là một <em>cách sống.</em></h2><p>Quan sát dáng cá là cách gần nhất để hình dung chúng đi qua làn nước ra sao.</p></div>
         <div className="chapter-shape-list">
           {shapes.map(shape => <article className="chapter-shape-row reveal" key={shape.number}><span className="chapter-shape-number">{shape.number}</span><div className={`chapter-shape-art ${shape.className}`} aria-hidden="true" /><div className="chapter-shape-copy"><h3>{shape.name}</h3><p>{shape.fish}</p></div></article>)}
         </div>
       </section>
+
+      <SizeRuler />
 
       <section className="folio folio-journal" id="quan-sat" aria-labelledby="observe-title">
         <div className="folio-topline"><span>06 / NHẬT KÝ QUAN SÁT</span><span>NHỮNG ĐIỀU NHỎ BÉ</span></div>
@@ -53,12 +64,16 @@ export function OceanChapters({ onAddSpecimen }: { onAddSpecimen: () => void }) 
         </div>
       </section>
 
+      <Aquarium motion={motion} />
+
       <section className="folio folio-care" id="giu-bien" aria-labelledby="care-title">
         <div className="folio-topline"><span>07 / GIỮ BIỂN TRONG LÀNH</span><span>NGÔI NHÀ CHUNG</span></div>
         <div className="care-heading reveal"><h2 id="care-title">Giữ lấy biển.<br /><em>Giữ lấy những điều kỳ diệu.</em></h2><p>Mỗi loài cá thuộc về một thế giới lớn hơn chính nó. Yêu một sinh vật cũng là trân trọng vùng nước nuôi dưỡng nó.</p></div>
         <figure className="care-plate reveal"><img src="/chapters/reef.webp" alt="Tranh rạn san hô với cá nhỏ, rong biển và rùa đang bơi" width={1536} height={1024} loading="lazy" /><figcaption>MỘT ĐẠI DƯƠNG / VÔ VÀN SỰ SỐNG</figcaption></figure>
         <div className="care-principles reveal"><p><span>01 / QUAN SÁT</span>Để sinh vật được tự do.</p><p><span>02 / TÔN TRỌNG</span>Để rạn biển được nguyên vẹn.</p><p><span>03 / GÌN GIỮ</span>Để lại một vùng nước sạch.</p></div>
       </section>
+
+      <AbyssInterlude motion={motion} />
 
       <section className="folio folio-invite" id="hanh-trinh" aria-labelledby="invite-title">
         <div className="invite-copy reveal"><span className="folio-label">08 / MỘT TRANG MỚI</span><h2 id="invite-title">Biển còn rộng.<br /><em>Chuyện còn dài.</em></h2><p>Mang theo sự tò mò.<br />Cùng viết tiếp cuốn thủy tộc chí của riêng bạn.</p><div className="invite-actions"><SakanaButton href="#bo-suu-tap" idPrefix="invite-col">VỀ BỘ SƯU TẬP <ArrowUpRight size={16} /></SakanaButton><SakanaButton onClick={onAddSpecimen} idPrefix="invite-add">THÊM MẪU CÁ <Plus size={16} /></SakanaButton></div></div>
